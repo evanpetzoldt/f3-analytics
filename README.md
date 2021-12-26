@@ -19,3 +19,15 @@ For running Weaselbot, you will need to create your own `data/siteq.csv` list...
 |:----------:|:------:|:-------:|
 | "ao-eagles-nest" | "Moneyball" | "U025H3PM1S9" |
 | ...      |  ... |          ... |
+
+## Running Weaselbot
+
+Information on Weaselbot is located here: https://api.slack.com/apps/A02K3PSN7C6. You may not have access, reach out to me if you would like it (I think you'll need to be on STC's Slack).
+
+I activate Weaselbot once a week on Sunday mornings using `run_weaselbot.sh`. You would need to update the file locations in that script.
+
+I utilize `Cron` to run this script. To run from `Cron`, run `crontab -e`, and then add something similar to:
+```
+SHELL=/bin/bash
+7 14 * * 0 /mnt/nas/ml/f3-analytics/run_weaselbot.sh > /tmp/f3cron.log 2>&1
+```
