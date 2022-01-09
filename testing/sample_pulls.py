@@ -16,7 +16,20 @@ from dotenv import load_dotenv
 # Import secrets
 dummy = load_dotenv()
 database_password = os.environ.get('database_password')
+database_write_password = os.environ.get('database_write_password')
 slack_secret = os.environ.get('slack_secret')
+
+# mydb = mysql.connector.connect(
+#   host="f3stlouis.cac36jsyb5ss.us-east-2.rds.amazonaws.com",
+#   user="f3stcharles",
+#   password=database_write_password,
+#   database="f3stcharles"
+# )
+# q = "SELECT * FROM aos"
+# df = pd.read_sql(q, mydb)
+# mycursor = mydb.cursor()
+# mycursor.execute("UPDATE aos SET backblast = 1 WHERE ao = 'achievement-unlocked';")
+# mycursor.execute("COMMIT;")
 
 mydb = mysql.connector.connect(
   host="f3stlouis.cac36jsyb5ss.us-east-2.rds.amazonaws.com",

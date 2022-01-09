@@ -10,8 +10,9 @@ import os
 import time
 import re
 from pandas.core.dtypes.missing import notnull
-from slack import WebClient
+# from slack import WebClient
 import ssl
+from slack_sdk import WebClient
 from pandas._libs import missing
 import os
 from dotenv import load_dotenv
@@ -120,5 +121,6 @@ Now may be a good time to reach out to them when you get a minute. No OYO! :fist
         print(f'Sent {siteq} this message:\n\n{sMessage}\n\n')
 
 # Send myself a message
-response2 = slack_client.chat_postMessage(channel='U025H3PM1S9', text='Successfully sent reports to ' + str(df_siteq['site_q']))
+separator = ', '
+response2 = slack_client.chat_postMessage(channel='U025H3PM1S9', text='Successfully sent reports to ' + separator.join(list(df_siteq['site_q'])))
 print("All done!")

@@ -37,7 +37,7 @@ df6 = pd.merge(df3, df5, validate='one_to_one', on=['year_num', 'week_num'])
 # Drop unneeded columns, rename, and filter
 df6.drop(columns=['year_num', 'week_num', 'pax_sum'], axis=1, inplace=True)
 df6.rename(columns={'pax_count_nonzero':'unique_posters', 'date_min':'week_start', 'ao':'beatdown_count'}, inplace=True)
-df6 = df6[(df6['week_start'] >= str(date(2021, 8, 2))) & (df6['week_start'] <= str(date(2021, 12, 18)))]
+df6 = df6[(df6['week_start'] >= str(date(2021, 8, 2))) & (df6['week_start'] <= str(date(2021, 12, 26)))]
 
 # Added calcs
 df6['unique_posters'] = df6['unique_posters'] + df6['fng_count']
@@ -52,7 +52,7 @@ df7 = df7.groupby(['backblast_id'], as_index=False)[['date', 'year_num', 'week_n
 df8 = df7.groupby(['year_num', 'week_num'], as_index=False).agg(
     {'date':min, 'pax_count':sum}
 )
-df8 = df8[(df8['date'] >= datetime(2021, 8, 2)) & (df8['date'] <= datetime(2021, 12, 18))]
+df8 = df8[(df8['date'] >= datetime(2021, 8, 2)) & (df8['date'] <= datetime(2021, 12, 26))]
 
 # Multiplot
 fig = make_subplots(rows=4, cols=2, subplot_titles=('Total Weekly Posts', 'Avg. PAX per Beatdown', 'Weekly Active PAX Count', 'Avg. Posts Per Active PAX', 'FNGs', 'QSource Posts', 'Recorded Beatdowns'))
