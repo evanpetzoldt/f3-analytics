@@ -11,10 +11,10 @@ from datetime import datetime, date, timedelta
 from pandas.core.dtypes import dtypes
 import plotly.express as px
 import re
-from slack import WebClient
-import ssl
 import os
 from dotenv import load_dotenv
+import ssl
+from slack_sdk import WebClient
 
 # Import secrets
 dummy = load_dotenv()
@@ -67,9 +67,11 @@ df['pax_list'] = df['backblast'].str.extract(r'((?<=pax:\s|pax\s<|pax<@|pax:<|pa
 df['q_list'] = df['backblast'].str.extract(r'((?<=Q:\s|Q\s<|Q<@|Q:<|Q\s:|_Q:).*(?=\n))', flags=re.IGNORECASE)
 df['pax_q_list'] = df['pax_list'].fillna('') + df['q_list'].fillna('')
 # df['ao_line'] = df['backblast'].str.extract(r'(((?<=ao:)|(?<=location:)|(?<=where:)).*(?=\n))', flags=re.IGNORECASE)[0]
+df['achievement'] = df['backblast'].str.extract(r'((?<=achievement:).*(?=\n))', flags=re.IGNORECASE)[0].str.strip()
+df['points'] = df['backblast'].str.extract(r'(((?<=points:)|(?<=patch_points:)).*(?=\n))', flags=re.IGNORECASE)[0].str.strip()
 
 # Create ruck / qsource / blackops / forge flags
-df['ruck_flag'] = df['backblast_title'].str.contains(r'\b(?:pre-ruck|preruck|ruck)\b', flags=re.IGNORECASE, regex=True)
+df['ruck_flag'] = df['backblast_title'].str.contains(r'\b(?:pre-ruck|preruck)\b', flags=re.IGNORECASE, regex=True)
 df.loc[df['AO']=='rucking', 'ruck_flag'] = True
 
 df['qsource_flag'] = df['backblast_title'].str.contains(r'\b(?:qsource)\b', flags=re.IGNORECASE, regex=True) | \
@@ -81,7 +83,7 @@ df.loc[df['AO']=='blackops', 'blackops_flag'] = True
 
 df['forge_flag'] = df['backblast_title'].str.contains(r'\b(?:forge)\b', flags=re.IGNORECASE, regex=True)
 df.loc[df['AO']=='ao-forge', 'forge_flag'] = True
-df.loc[pd.to_datetime(df['Date']).dt.day_name()!='Wednesday', 'forge_flag'] = False
+# df.loc[pd.to_datetime(df['Date']).dt.day_name()!='Wednesday', 'forge_flag'] = False Forge can happen on any day of the week now!
 
 # Expand PAX list row-wise
 pax_expand = df['pax_q_list'].str.extractall(r'\<@(.*?)\>', flags=re.IGNORECASE)
@@ -141,6 +143,7 @@ final_df = final_df[~final_df['pax'].isna()]
 final_df['month_name'] = pd.DatetimeIndex(final_df['date']).month_name()
 final_df['day_of_week'] = pd.DatetimeIndex(final_df['date']).day_name()
 final_df['year_num'] = pd.DatetimeIndex(final_df['date']).year
+final_df['month_num'] = pd.DatetimeIndex(final_df['date']).month
 final_df['week_num'] = pd.Int64Index(pd.DatetimeIndex(final_df['date']).isocalendar().week)
 final_df['day_num'] = pd.DatetimeIndex(final_df['date']).day
 
@@ -157,6 +160,9 @@ home_ao_df.rename(columns={'ao':'home_ao'}, inplace=True)
 # Merge home AO and Site Q
 final_df = pd.merge(final_df, home_ao_df, how='left')
 final_df['home_ao'].fillna('unknown', inplace=True)
+
+# Manual fixes
+final_df.loc[((final_df.pax == 'Kramer') & (final_df.date == date(2022, 1, 5))), 'q_flag'] = True
 
 # Export final table
 final_df.to_csv('data/master_table.csv', index=False)
