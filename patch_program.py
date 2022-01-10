@@ -265,6 +265,7 @@ ssl_context.verify_mode = ssl.CERT_NONE
 slack_client = WebClient(slack_secret, ssl=ssl_context)
 
 # Loop through achievement list, looking for achievements earned but not yet awarded
+award_count = 0
 for index, row in achievement_list.iterrows():
     award = row['code']
     
@@ -285,6 +286,7 @@ for index, row in achievement_list.iterrows():
             sMessage = f"Congrats to our man <@{pax_row['pax_id']}>! He just unlocked the achievement *{row['name']}* for {row['verb']}. This is achievement #{achievements_to_date} for <@{pax_row['pax_id']}> this year. Keep up the good work!"
             response = slack_client.chat_postMessage(channel=achievement_channel, text=sMessage, link_names=True)
             response2 = slack_client.reactions_add(channel=achievement_channel, name='fire', timestamp=response['ts'])
+            award_count += 1
             
             
 
@@ -292,5 +294,5 @@ for index, row in achievement_list.iterrows():
 awarded_table.to_csv('data/awarded_table.csv')
 
 # Send confirmation message to myself
-response = slack_client.chat_postMessage(channel='U025H3PM1S9', text='Patch program run for the day, {award_count} awards tagged')
+response = slack_client.chat_postMessage(channel='U025H3PM1S9', text=f'Patch program run for the day, {award_count} awards tagged')
 print("All done!")
